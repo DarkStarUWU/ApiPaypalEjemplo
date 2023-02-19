@@ -9,7 +9,7 @@ const router = Router();
 
 
 
-router.get('/crear-order', createOrder);
+router.post('/crear-order', createOrder);
 
 
 router.get('/capturar-order', capturandoOrder);

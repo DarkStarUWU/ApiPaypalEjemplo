@@ -1,39 +1,58 @@
 import axios from 'axios';
-import {PAYPAL_API, PAYPAL_API_CLIENT, PAYPAL_SECRET_CLIENT} from '../config'
+import {PAYPAL_API, PAYPAL_API_CLIENT, PAYPAL_API_SECRET} from '../config'
 
 export const createOrder = async (req, res)=> {
-
-    const order = {
-        intent: 'CAPTURE',
-        purchase_units: [{
-            amount:{
-                currency_code: 'USD',
-                value: '300.33',
+    try {
+        const order = {
+            intent: "CAPTURE",
+            purchase_units: [
+                {
+                    amount: {
+                        currency_code: "USD",
+                        value: "300.70",
+                    },
+                    description: "COMPRAR SERVICIOS GAY DE XIXICO",
+                }
+    
+            ],
+            application_context: {
+                brand_name: "MyCompany",
+                landing_page: "LOGIN",
+                user_action: "PAY_NOW",
+                return_url: "localhost:4000/capturar-order",
+                cancel_url: "localhost:4000/cancelar-order",
+            }
+        };
+        const params = new URLSearchParams();
+        params.append('grant_type', 'client_credentials');
+    
+        const {data: {access_token}} = await axios.post(`https://api-m.sandbox.paypal.com/v1/oauth2/token`, params, {
+            headers:{
+                "Content-Type": 'application/x-www-form-urlencoded',
+                
             },
-            description: "Instalador de aplicaciond edit",
-
-        },
-    ],
-    application_context:{
-        brand_name: "Mycompany.com",
-        landing_page: "Login",
-        user_action: "PAY_NOW",
-        return_url: "http://localhost:3000/capturar-order",
-        cancel_url: "http://localhost:3000/cancel-order",
-
-     },
-
-    };
-    const response = await axios.post(`${PAYPAL_API}/v2/checkout/orders`, order, {
-        auth: {
-            username: PAYPAL_API_CLIENT,
-            password: PAYPAL_SECRET_CLIENT,
-
-        },
-
-    });
-    console.log(response)
-    res.send('gay');
+            auth: {
+                username: PAYPAL_API_CLIENT,
+                password: PAYPAL_API_SECRET,
+    
+        }
+    
+        });
+        // console.log(data);
+    
+        const response = await axios.post(`${PAYPAL_API}/v2/checkout/orders`, order, {
+            headers:{
+                Authorization: `Bearer ${access_token}`
+    
+            }
+        });
+    
+        console.log(response.data)
+        res.json(response.data)
+    
+    } catch (error) {
+        return res.status(500).send('algo fue mal')
+    }
 }
 
 export const capturandoOrder = (req, res)=> {
