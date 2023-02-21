@@ -67,14 +67,14 @@ export const capturandoOrder = async(req, res)=> {
     }})
 
     console.log(response.data)
-    res.send("xixixcogay");
+    return res.redirect('/paymend.html')
 
 
 }
 
 export const cancelandoOrder = (req, res)=> {
 
-    res.send('Cancelando Orden')
+    return res.redirect('/');
 
 
 }
